@@ -95,6 +95,7 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
                 index={index}
                 toDoId={toDo.id}
                 toDoText={toDo.text}
+                boardId={boardId}
               />
             ))}
             {provided.placeholder}
