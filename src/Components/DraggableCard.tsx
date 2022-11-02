@@ -7,6 +7,7 @@ import { toDoState } from "../atoms";
 const Card = styled.div<{ isDragging: boolean }>`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-radius: 5px;
   padding: 5px 10px;
   margin-bottom: 5px;

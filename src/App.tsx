@@ -4,6 +4,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
 import Board from "./Components/Board";
+import plusButton from "./assets/plusButton.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,6 +13,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  flex-direction: column;
 `;
 
 const Boards = styled.div`
@@ -20,6 +22,22 @@ const Boards = styled.div`
   align-items: flex-start;
   width: 100%;
   gap: 10px;
+`;
+
+const ButtonArea = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-size: 20px;
+  background-color: #4a69bd;
+  padding: 5px;
+  margin-top: 10px;
+  width: 200px;
+`;
+
+const Image = styled.img`
+  width: 50px;
 `;
 
 const App = () => {
@@ -65,6 +83,19 @@ const App = () => {
       });
     }
   };
+
+  const handleAddBoard = () => {
+    setToDos((allBoards) => {
+      const newBoardCount =
+        Object.keys(allBoards).filter((key) => key.includes("새로운 보드"))
+          .length + 1;
+      return {
+        ...allBoards,
+        [`새로운 보드${" " + newBoardCount}`]: [],
+      };
+    });
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
@@ -73,6 +104,10 @@ const App = () => {
             <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
           ))}
         </Boards>
+        <ButtonArea onClick={handleAddBoard}>
+          <Image src={plusButton} />
+          보드 추가하기
+        </ButtonArea>
       </Wrapper>
     </DragDropContext>
   );
