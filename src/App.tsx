@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
@@ -23,6 +24,15 @@ const Boards = styled.div`
 
 const App = () => {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  useEffect(() => {
+    const object = localStorage.getItem("toDos");
+    setToDos(JSON.parse(object!));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("toDos", JSON.stringify(toDos));
+  }, [toDos]);
+
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
     if (!destination) return;
