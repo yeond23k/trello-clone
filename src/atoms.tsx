@@ -6,14 +6,11 @@ export interface ITodo {
 }
 
 export interface IToDoState {
-  [key: string]: ITodo[];
+  boardId: string;
+  data: ITodo[];
 }
 
-export const toDoState = atom<IToDoState>({
+export const toDoState = atom<IToDoState[]>({
   key: "toDo",
-  default: {
-    "To Do": [],
-    Doing: [],
-    Done: [],
-  },
+  default: [],
 });

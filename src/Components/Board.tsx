@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
@@ -15,10 +16,16 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
 const Title = styled.h2`
   text-align: center;
   font-weight: 600;
-  margin-bottom: 10px;
   font-size: 18px;
 `;
 
@@ -55,25 +62,72 @@ interface IForm {
   toDo: string;
 }
 
+interface IForm2 {
+  boardTitle: string;
+}
+
 const Board = ({ toDos, boardId }: IBoardProps) => {
   const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
+  const {
+    register: register2,
+    setValue: setValue2,
+    handleSubmit: handleSubmit2,
+  } = useForm<IForm2>();
+  const [isEdit, setIsEdit] = useState(false);
+  const inputTitleRef = useRef<HTMLInputElement>(null);
+
   const onValid = ({ toDo }: IForm) => {
+    console.log(toDo);
     const newToDo = {
       id: Date.now(),
       text: toDo,
     };
     setToDos((allBoards) => {
-      return {
-        ...allBoards,
-        [boardId]: [...allBoards[boardId], newToDo],
-      };
+      return allBoards.map((board) => {
+        return board.boardId === boardId
+          ? { ...board, data: [...board.data, newToDo] }
+          : board;
+      });
     });
     setValue("toDo", "");
   };
+
+  const handleOnClick = (boardId: string) => {
+    console.log(boardId);
+    setValue2("boardTitle", boardId);
+    setIsEdit((prev) => !prev);
+  };
+
+  const onValidTitle = ({ boardTitle }: IForm2) => {
+    setToDos((allBoards) => {
+      return allBoards.map((board) => {
+        return board.boardId === boardId
+          ? { ...board, boardId: boardTitle }
+          : board;
+      });
+    });
+    setValue2("boardTitle", "");
+    setIsEdit((prev) => !prev);
+  };
+
   return (
     <Wrapper>
-      <Title>{boardId}</Title>
+      <Header>
+        <span>test</span>
+        {isEdit ? (
+          <Form onSubmit={handleSubmit2(onValidTitle)}>
+            <input
+              {...register2("boardTitle", { required: true })}
+              type="text"
+              onBlur={() => setIsEdit((prev) => !prev)}
+            />
+          </Form>
+        ) : (
+          <Title onClick={() => handleOnClick(boardId)}>{boardId}</Title>
+        )}
+        <span>test</span>
+      </Header>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}

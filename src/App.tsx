@@ -57,29 +57,48 @@ const App = () => {
     if (destination?.droppableId === source.droppableId) {
       // same board movement.
       setToDos((allBoards) => {
-        const boardCopy = [...allBoards[source.droppableId]];
+        const boardCopy = [
+          ...allBoards
+            .filter(({ boardId }) => boardId === source.droppableId)
+            .map((board) => board.data)[0],
+        ];
+
         const taskObj = boardCopy[source.index];
         boardCopy.splice(source.index, 1);
         boardCopy.splice(destination?.index, 0, taskObj);
-        return {
-          ...allBoards,
-          [source.droppableId]: boardCopy,
-        };
+
+        return allBoards.map((board) => {
+          return board.boardId === source.droppableId
+            ? { ...board, data: boardCopy }
+            : board;
+        });
       });
     } else {
       // cross board movement.
       setToDos((allBoards) => {
-        const sourceBoard = [...allBoards[source.droppableId]];
+        const sourceBoard = [
+          ...allBoards
+            .filter(({ boardId }) => boardId === source.droppableId)
+            .map((board) => board.data)[0],
+        ];
+
         const taskObj = sourceBoard[source.index];
-        const destinationBoard = [...allBoards[destination?.droppableId]];
+        const destinationBoard = [
+          ...allBoards
+            .filter(({ boardId }) => boardId === destination.droppableId)
+            .map((board) => board.data)[0],
+        ];
+
         sourceBoard.splice(source.index, 1);
         destinationBoard.splice(destination?.index, 0, taskObj);
 
-        return {
-          ...allBoards,
-          [source.droppableId]: sourceBoard,
-          [destination?.droppableId]: destinationBoard,
-        };
+        return allBoards.map((board) => {
+          if (board.boardId === source.droppableId)
+            return { ...board, data: sourceBoard };
+          else if (board.boardId === destination.droppableId)
+            return { ...board, data: destinationBoard };
+          else return board;
+        });
       });
     }
   };
@@ -87,12 +106,16 @@ const App = () => {
   const handleAddBoard = () => {
     setToDos((allBoards) => {
       const newBoardCount =
-        Object.keys(allBoards).filter((key) => key.includes("새로운 보드"))
+        allBoards.filter(({ boardId }) => boardId.includes("새로운 보드"))
           .length + 1;
-      return {
+
+      return [
         ...allBoards,
-        [`새로운 보드${" " + newBoardCount}`]: [],
-      };
+        {
+          boardId: `새로운 보드 ${newBoardCount}`,
+          data: [],
+        },
+      ];
     });
   };
 
@@ -100,8 +123,8 @@ const App = () => {
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
         <Boards>
-          {Object.keys(toDos).map((boardId) => (
-            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
+          {toDos.map(({ boardId, data }) => (
+            <Board boardId={boardId} key={boardId} toDos={data} />
           ))}
         </Boards>
         <ButtonArea onClick={handleAddBoard}>

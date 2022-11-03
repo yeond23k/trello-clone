@@ -2,7 +2,7 @@ import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { toDoState } from "../atoms";
+import { IToDoState, toDoState } from "../atoms";
 
 const Card = styled.div<{ isDragging: boolean }>`
   display: flex;
@@ -34,10 +34,11 @@ const DraggableCard = (props: IDraggableCardProps) => {
   const setToDos = useSetRecoilState(toDoState);
   const handleDeleteItems = () => {
     setToDos((allBoards) => {
-      return {
-        ...allBoards,
-        [boardId]: allBoards[boardId].filter((toDo) => toDo.id !== toDoId),
-      };
+      return allBoards.map((board) => {
+        return board.boardId === boardId
+          ? { ...board, data: board.data.filter((toDo) => toDo.id !== toDoId) }
+          : board;
+      });
     });
   };
   return (
