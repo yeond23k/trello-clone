@@ -1,6 +1,6 @@
 # Code Challenge
 
-[ ] 스타일 꾸미기
+[ ] 스타일 꾸미기<br/>
 [✓] 작성한 모든 todo를 localStorage에 저장 및 로드하기
 [✓] 작성한 todo 삭제하기
 [✓] 보드 생성하기
