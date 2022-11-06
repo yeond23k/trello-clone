@@ -5,6 +5,7 @@ import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { ITodo, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
+import Header from "./Header";
 
 const Wrapper = styled.div`
   width: 300px;
@@ -14,19 +15,6 @@ const Wrapper = styled.div`
   min-height: 300px;
   display: flex;
   flex-direction: column;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  font-weight: 600;
-  font-size: 18px;
 `;
 
 interface IAreaProps {
@@ -62,19 +50,10 @@ interface IForm {
   toDo: string;
 }
 
-interface IForm2 {
-  boardTitle: string;
-}
-
 const Board = ({ toDos, boardId }: IBoardProps) => {
   const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
-  const {
-    register: register2,
-    setValue: setValue2,
-    handleSubmit: handleSubmit2,
-  } = useForm<IForm2>();
-  const [isEdit, setIsEdit] = useState(false);
+
   // const inputTitleRef = useRef<HTMLInputElement>(null);
 
   const onValid = ({ toDo }: IForm) => {
@@ -93,55 +72,9 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
     setValue("toDo", "");
   };
 
-  const handleOnClick = (boardId: string) => {
-    console.log(boardId);
-    setValue2("boardTitle", boardId);
-    setIsEdit((prev) => !prev);
-  };
-
-  const onValidTitle = ({ boardTitle }: IForm2) => {
-    setToDos((allBoards) => {
-      return allBoards.map((board) => {
-        return board.boardId === boardId
-          ? { ...board, boardId: boardTitle }
-          : board;
-      });
-    });
-    setValue2("boardTitle", "");
-    setIsEdit((prev) => !prev);
-  };
-
-  const handleDeleteAllToDos = (boardId: string) => {
-    setToDos((allBoards) => {
-      return allBoards.map((board) => {
-        return board.boardId === boardId ? { ...board, data: [] } : board;
-      });
-    });
-  };
-
-  const handleDeleteBoard = (boardId: string) => {
-    setToDos((allBoards) => {
-      return allBoards.filter((board) => board.boardId !== boardId);
-    });
-  };
-
   return (
     <Wrapper>
-      <Header>
-        <span onClick={() => handleDeleteBoard(boardId)}>❎</span>
-        {isEdit ? (
-          <Form onSubmit={handleSubmit2(onValidTitle)}>
-            <input
-              {...register2("boardTitle", { required: true })}
-              type="text"
-              onBlur={() => setIsEdit((prev) => !prev)}
-            />
-          </Form>
-        ) : (
-          <Title onClick={() => handleOnClick(boardId)}>{boardId}</Title>
-        )}
-        <span onClick={() => handleDeleteAllToDos(boardId)}>전체삭제</span>
-      </Header>
+      <Header boardId={boardId} />
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}
