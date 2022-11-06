@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
@@ -51,54 +51,70 @@ const App = () => {
   }, [toDos]);
 
   const onDragEnd = (info: DropResult) => {
+    console.log(info);
     const { destination, source } = info;
+
     if (!destination) return;
-    if (destination?.droppableId === source.droppableId) {
-      // same board movement.
+
+    if (source.droppableId === "main" && destination.droppableId === "main") {
       setToDos((allBoards) => {
-        const boardCopy = [
-          ...allBoards
-            .filter(({ boardId }) => boardId === source.droppableId)
-            .map((board) => board.data)[0],
-        ];
+        const allBoardsCopy = [...allBoards];
+        const taskObj = allBoards[source.index];
+        allBoardsCopy.splice(source.index, 1);
+        allBoardsCopy.splice(destination?.index, 0, taskObj);
 
-        const taskObj = boardCopy[source.index];
-        boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination?.index, 0, taskObj);
-
-        return allBoards.map((board) => {
-          return board.boardId === source.droppableId
-            ? { ...board, data: boardCopy }
-            : board;
-        });
+        return allBoardsCopy;
       });
-    } else {
-      // cross board movement.
-      setToDos((allBoards) => {
-        const sourceBoard = [
-          ...allBoards
-            .filter(({ boardId }) => boardId === source.droppableId)
-            .map((board) => board.data)[0],
-        ];
+    }
 
-        const taskObj = sourceBoard[source.index];
-        const destinationBoard = [
-          ...allBoards
-            .filter(({ boardId }) => boardId === destination.droppableId)
-            .map((board) => board.data)[0],
-        ];
+    if (source.droppableId !== "main" && destination.droppableId !== "main") {
+      if (destination?.droppableId === source.droppableId) {
+        // same board movement.
+        setToDos((allBoards) => {
+          const boardCopy = [
+            ...allBoards
+              .filter(({ boardId }) => boardId === source.droppableId)
+              .map((board) => board.data)[0],
+          ];
 
-        sourceBoard.splice(source.index, 1);
-        destinationBoard.splice(destination?.index, 0, taskObj);
+          const taskObj = boardCopy[source.index];
+          boardCopy.splice(source.index, 1);
+          boardCopy.splice(destination?.index, 0, taskObj);
 
-        return allBoards.map((board) => {
-          if (board.boardId === source.droppableId)
-            return { ...board, data: sourceBoard };
-          else if (board.boardId === destination.droppableId)
-            return { ...board, data: destinationBoard };
-          else return board;
+          return allBoards.map((board) => {
+            return board.boardId === source.droppableId
+              ? { ...board, data: boardCopy }
+              : board;
+          });
         });
-      });
+      } else {
+        // cross board movement.
+        setToDos((allBoards) => {
+          const sourceBoard = [
+            ...allBoards
+              .filter(({ boardId }) => boardId === source.droppableId)
+              .map((board) => board.data)[0],
+          ];
+
+          const taskObj = sourceBoard[source.index];
+          const destinationBoard = [
+            ...allBoards
+              .filter(({ boardId }) => boardId === destination.droppableId)
+              .map((board) => board.data)[0],
+          ];
+
+          sourceBoard.splice(source.index, 1);
+          destinationBoard.splice(destination?.index, 0, taskObj);
+
+          return allBoards.map((board) => {
+            if (board.boardId === source.droppableId)
+              return { ...board, data: sourceBoard };
+            else if (board.boardId === destination.droppableId)
+              return { ...board, data: destinationBoard };
+            else return board;
+          });
+        });
+      }
     }
   };
 
@@ -120,14 +136,24 @@ const App = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Wrapper>
-        <Boards>
-          {toDos.map(({ boardId, data }) => (
-            <Board boardId={boardId} key={boardId} toDos={data} />
-          ))}
-        </Boards>
-        <ButtonArea onClick={handleAddBoard}>➕ 보드 추가하기</ButtonArea>
-      </Wrapper>
+      <Droppable droppableId="main">
+        {(provided, snapshot) => (
+          <Wrapper ref={provided.innerRef} {...provided.droppableProps}>
+            <Boards>
+              {toDos.map(({ boardId, data }, index) => (
+                <Board
+                  boardId={boardId}
+                  key={boardId}
+                  toDos={data}
+                  index={index}
+                />
+              ))}
+            </Boards>
+            <ButtonArea onClick={handleAddBoard}>➕ 보드 추가하기</ButtonArea>
+            {provided.placeholder}
+          </Wrapper>
+        )}
+      </Droppable>
     </DragDropContext>
   );
 };
