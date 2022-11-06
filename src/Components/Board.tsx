@@ -119,10 +119,16 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
     });
   };
 
+  const handleDeleteBoard = (boardId: string) => {
+    setToDos((allBoards) => {
+      return allBoards.filter((board) => board.boardId !== boardId);
+    });
+  };
+
   return (
     <Wrapper>
       <Header>
-        <span>test</span>
+        <span onClick={() => handleDeleteBoard(boardId)}>❎</span>
         {isEdit ? (
           <Form onSubmit={handleSubmit2(onValidTitle)}>
             <input
