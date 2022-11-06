@@ -75,7 +75,7 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
     handleSubmit: handleSubmit2,
   } = useForm<IForm2>();
   const [isEdit, setIsEdit] = useState(false);
-  const inputTitleRef = useRef<HTMLInputElement>(null);
+  // const inputTitleRef = useRef<HTMLInputElement>(null);
 
   const onValid = ({ toDo }: IForm) => {
     console.log(toDo);
@@ -111,6 +111,14 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
     setIsEdit((prev) => !prev);
   };
 
+  const handleDeleteAllToDos = (boardId: string) => {
+    setToDos((allBoards) => {
+      return allBoards.map((board) => {
+        return board.boardId === boardId ? { ...board, data: [] } : board;
+      });
+    });
+  };
+
   return (
     <Wrapper>
       <Header>
@@ -126,7 +134,7 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
         ) : (
           <Title onClick={() => handleOnClick(boardId)}>{boardId}</Title>
         )}
-        <span>test</span>
+        <span onClick={() => handleDeleteAllToDos(boardId)}>전체삭제</span>
       </Header>
       <Form onSubmit={handleSubmit(onValid)}>
         <input

@@ -4,7 +4,6 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
 import Board from "./Components/Board";
-import plusButton from "./assets/plusButton.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -127,10 +126,7 @@ const App = () => {
             <Board boardId={boardId} key={boardId} toDos={data} />
           ))}
         </Boards>
-        <ButtonArea onClick={handleAddBoard}>
-          <Image src={plusButton} />
-          보드 추가하기
-        </ButtonArea>
+        <ButtonArea onClick={handleAddBoard}>➕ 보드 추가하기</ButtonArea>
       </Wrapper>
     </DragDropContext>
   );
